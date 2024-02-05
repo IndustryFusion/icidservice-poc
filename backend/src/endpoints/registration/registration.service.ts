@@ -15,12 +15,19 @@ export class RegistrationService {
 
   async create(data: RegistrationDescriptionDto) {
     const saltRounds = 10; 
-    data.password = await bcrypt.hash(data.password, saltRounds);
-    data.confirm_password = await bcrypt.hash(data.confirm_password, saltRounds);
-    data.icid_manufacturer = uuidv5(data.manufacturer_name, process.env.IFF_NAMESPACE);
-    console.log('user data ',data);
-    const createdUser = new this.userModel(data);
-    return createdUser.save();
+    data.manufacturer_name = data.manufacturer_name.toUpperCase().replace(/ /g, "_");
+    const response = await this.userModel.find({manufacturer_name: data.manufacturer_name});
+    console.log('response ',response)
+    if(response.length > 0) {
+      return 'Manufacturer already exists';
+    } else {
+      data.password = await bcrypt.hash(data.password, saltRounds);
+      data.confirm_password = await bcrypt.hash(data.confirm_password, saltRounds);
+      data.icid_manufacturer = uuidv5(data.manufacturer_name, process.env.IFF_NAMESPACE);
+      console.log('user data ',data);
+      const createdUser = new this.userModel(data);
+      return createdUser.save();
+    }
   }
 
   async findAll() {
