@@ -25,13 +25,13 @@ export class User {
   country: string;
 
   @Prop()
-  companyRegistrationNumber: number;
+  company_registration_number: number;
 
   @Prop()
-  factoryServerUUID: string[];
+  factory_server_uuid: string[];
 
   @Prop()
-  gatewayUUID: string[];
+  gateway_uuid: string[];
 
   @Prop()
   ifric_id_company: string;
