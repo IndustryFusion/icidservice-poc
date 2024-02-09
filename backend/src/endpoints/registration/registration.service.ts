@@ -1,9 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, BadRequestException } from '@nestjs/common';
 import { Model, ObjectId } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { RegistrationDescriptionDto } from './dto/registrationDescription.dto';
 import { User } from 'src/schemas/user.schema';
-import { v5 as uuidv5 } from 'uuid';
+import { v5 as uuidv5, validate as uuidValidate } from 'uuid';
 import * as bcrypt from 'bcrypt';
 
 @Injectable()
@@ -12,19 +12,33 @@ export class RegistrationService {
     @InjectModel(User.name)
     private userModel: Model<User>,
   ) {}
+  private readonly ifricId = process.env.IFRIC_NAMESPACE;
 
   async create(data: RegistrationDescriptionDto) {
-    const saltRounds = 10; 
-    data.manufacturer_name = data.manufacturer_name.toUpperCase().replace(/ /g, "_");
-    const response = await this.userModel.find({manufacturer_name: data.manufacturer_name});
+    const response = await this.userModel.find({companyRegistrationNumber: data.companyRegistrationNumber});
     console.log('response ',response)
     if(response.length > 0) {
-      return 'Manufacturer already exists';
-    } else {
-      data.password = await bcrypt.hash(data.password, saltRounds);
-      data.confirm_password = await bcrypt.hash(data.confirm_password, saltRounds);
-      data.icid_manufacturer = uuidv5(data.manufacturer_name, process.env.IFF_NAMESPACE);
-      console.log('user data ',data);
+      return 'Company Registration Number already exists';
+    } else {  
+      data.ifric_id_company = uuidv5(data.companyRegistrationNumber, this.ifricId);
+      data.ifric_id_Factory_server = [];
+      for(let i = 0; i < data.factoryServerUUID.length; i++) {
+        let id = data.factoryServerUUID[i];
+        if(uuidValidate(id)) {
+          data.ifric_id_Factory_server.push(uuidv5(id, this.ifricId));
+        } else {
+          throw new BadRequestException(`${data.factoryServerUUID[i]} is Invalid UUID`);
+        }
+      }
+      data.ifric_id_gateway = [];
+      for(let i = 0; i < data.gatewayUUID.length; i++) {
+        let id = data.gatewayUUID[i];
+        if(uuidValidate(id)) {
+          data.ifric_id_gateway.push(uuidv5(id, this.ifricId));
+        } else {
+          throw new BadRequestException(`${data.gatewayUUID[i]} is Invalid UUID`);
+        }
+      }
       const createdUser = new this.userModel(data);
       return createdUser.save();
     }

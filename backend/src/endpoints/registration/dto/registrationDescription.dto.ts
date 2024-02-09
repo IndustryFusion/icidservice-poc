@@ -1,12 +1,14 @@
 export interface RegistrationDescriptionDto {
-    username?: string;
-    password?: string;
-    confirm_password: string;
-    manufacturer_name: string;
-    icid_manufacturer: string;
+    companyName: string;
     street: string;
     city: string;
     zip: string;
     state: string;
     country: string;
+    companyRegistrationNumber: string;
+    factoryServerUUID: string[];
+    gatewayUUID: string[];
+    ifric_id_company: string;
+    ifric_id_Factory_server: string[];
+    ifric_id_gateway: string[]
 }
