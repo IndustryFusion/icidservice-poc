@@ -5,17 +5,9 @@ export type UserDocument = HydratedDocument<User>;
 
 @Schema()
 export class User {
+  
   @Prop()
-  username: string;
-
-  @Prop()
-  password: string;
-
-  @Prop()
-  confirm_password: string;
-
-  @Prop()
-  manufacturer_name: string;
+  companyName: string;
 
   @Prop()
   street: string;
@@ -31,9 +23,24 @@ export class User {
 
   @Prop()
   country: string;
-  
+
   @Prop()
-  icid_manufacturer: string;
+  companyRegistrationNumber: number;
+
+  @Prop()
+  factoryServerUUID: string[];
+
+  @Prop()
+  gatewayUUID: string[];
+
+  @Prop()
+  ifric_id_company: string;
+
+  @Prop()
+  ifric_id_Factory_server: string[];
+
+  @Prop()
+  ifric_id_gateway: string[];
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
