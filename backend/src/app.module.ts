@@ -3,10 +3,11 @@ import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { MongooseModule } from '@nestjs/mongoose';
-import { UserSchema, User } from './schemas/user.schema';
+import { CompanySchema, Company } from './schemas/company.schema';
 import { RegistrationController } from './endpoints/registration/registration.controller';
 import { RegistrationService } from './endpoints/registration/registration.service';
-
+import { CheckController } from './endpoints/check/check.controller';
+import { CheckService } from './endpoints/check/check.service';
 dotenv.config();
 const mongoURI = process.env.MONGO_URL;
 
@@ -14,16 +15,18 @@ const mongoURI = process.env.MONGO_URL;
   imports: [
     MongooseModule.forRoot(mongoURI),
     MongooseModule.forFeature([
-      { name: User.name, schema: UserSchema },
+      { name: Company.name, schema: CompanySchema },
     ]),
   ],
   controllers: [
     AppController,
-    RegistrationController
+    RegistrationController,
+    CheckController
   ],
   providers: [
     AppService,
-    RegistrationService
+    RegistrationService,
+    CheckService
   ],
 })
 export class AppModule {}

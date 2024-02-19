@@ -2,20 +2,20 @@ import { Injectable, BadRequestException } from '@nestjs/common';
 import { Model, ObjectId } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { RegistrationDescriptionDto } from './dto/registrationDescription.dto';
-import { User } from 'src/schemas/user.schema';
+import { Company } from 'src/schemas/company.schema';
 import { v5 as uuidv5, validate as uuidValidate } from 'uuid';
 import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class RegistrationService {
   constructor(
-    @InjectModel(User.name)
-    private userModel: Model<User>,
+    @InjectModel(Company.name)
+    private companyModel: Model<Company>,
   ) {}
   private readonly ifricId = process.env.IFRIC_NAMESPACE;
 
   async create(data: RegistrationDescriptionDto) {
-    const response = await this.userModel.find({company_registration_number: data.company_registration_number});
+    const response = await this.companyModel.find({company_registration_number: data.company_registration_number});
     console.log('response ',response)
     if(response.length > 0) {
       return 'Company Registration Number already exists';
@@ -39,17 +39,17 @@ export class RegistrationService {
           throw new BadRequestException(`${data.gateway_uuid[i]} is Invalid UUID`);
         }
       }
-      const createdUser = new this.userModel(data);
-      return createdUser.save();
+      const createdCompany = new this.companyModel(data);
+      return createdCompany.save();
     }
   }
 
   async findAll() {
-    return await this.userModel.find();
+    return await this.companyModel.find();
   }
 
   async findOne(id: string) {
-    return await this.userModel.findById(id);
+    return await this.companyModel.findById(id);
   }
 
   update(id: string) {
@@ -57,6 +57,6 @@ export class RegistrationService {
   }
 
   async remove(id: string) {
-    return await this.userModel.deleteOne({ _id: id });
+    return await this.companyModel.deleteOne({ _id: id });
   }
 }
