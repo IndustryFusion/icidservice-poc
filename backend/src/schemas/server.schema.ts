@@ -1,20 +1,21 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { UUID } from 'crypto';
 import * as mongoose from 'mongoose';
 import { HydratedDocument } from 'mongoose';
 
-export type CompanyDocument = HydratedDocument<Company>;
+export type ServerDocument = HydratedDocument<Server>;
 
 @Schema()
-export class Company {
+export class Server {
   
-  @Prop()
-  registration_code: string;
-
-  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Country' })
-  country_id: number;
-
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Urn' })
   urn_id: number;
+
+  @Prop()
+  hardware_uuid: UUID;
+
+  @Prop()
+  hardware_serial_number: string;
 
   @Prop()
   created_at: Date;
@@ -23,4 +24,4 @@ export class Company {
   last_updated_at: Date;
 }
 
-export const CompanySchema = SchemaFactory.createForClass(Company);
+export const ServerSchema = SchemaFactory.createForClass(Server);
