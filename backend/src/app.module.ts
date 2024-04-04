@@ -14,12 +14,17 @@ import { RegionSchema, Region } from 'src/schemas/region.schema';
 import { ServerSchema, Server } from 'src/schemas/server.schema';
 import { UrnSchema, Urn } from 'src/schemas/urn.schema';
 import { UserSchema, User } from 'src/schemas/user.schema';
-import { RegistrationController } from './endpoints/registration/registration.controller';
-import { RegistrationService } from './endpoints/registration/registration.service';
-import { CheckController } from './endpoints/check/check.controller';
-import { CheckService } from './endpoints/check/check.service';
 import { ScriptController } from './endpoints/script/script.controller';
 import { ScriptService } from './endpoints/script/script.service';
+import { AssetController } from './endpoints/asset/asset.controller';
+import { AssetService } from './endpoints/asset/asset.service';
+import { GatewayController } from './endpoints/gateway/gateway.controller';
+import { GatewayService } from './endpoints/gateway/gateway.service';
+import { CompanyController } from './endpoints/company/company.controller';
+import { CompanyService } from './endpoints/company/company.service';
+import { UserController } from './endpoints/user/user.controller';
+import { UserService } from './endpoints/user/user.service';
+
 dotenv.config();
 const mongoURI = process.env.MONGO_URL;
 
@@ -42,15 +47,19 @@ const mongoURI = process.env.MONGO_URL;
   ],
   controllers: [
     AppController,
-    RegistrationController,
-    CheckController,
-    ScriptController
+    ScriptController,
+    AssetController,
+    GatewayController,
+    CompanyController,
+    UserController
   ],
   providers: [
     AppService,
-    RegistrationService,
-    CheckService,
-    ScriptService
+    ScriptService,
+    AssetService,
+    GatewayService,
+    CompanyService,
+    UserService
   ],
 })
 export class AppModule {}
