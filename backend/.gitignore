@@ -1,6 +1,7 @@
 # compiled output
 /dist
 /node_modules
+/build
 
 # Logs
 logs
@@ -38,3 +39,4 @@ config.zsh
 
 /uploads
 /public
+.env
