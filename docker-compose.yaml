@@ -1,0 +1,9 @@
+version: '3.7'
+
+services:
+  icid-backend:
+    image: ${DOCKER_PREFIX:-ibn40}/icid-backend:${DOCKER_TAG:-latest}
+    build:
+      context: ./backend
+    ports:
+    - "4010:4010"
