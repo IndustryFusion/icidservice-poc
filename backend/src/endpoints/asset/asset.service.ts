@@ -24,7 +24,35 @@ export class AssetService {
 
   async create(data: any) {
     try{
-      let objectSubTypeResponse = await this.objectSubTypeModel.find({object_sub_type_code: data.object_sub_type_code.toUpperCase()});
+      if(data.type && data.type == 'asset'){
+        let response = await this.assetModel.find({machine_serial_number: data.machine_serial_number});
+        if(!(response.length > 0)){
+          let uuid = uuidv5(data.machine_serial_number, this.ifricId);
+          let ifricId = `urn:ifric:IFX-EUR-NLD-AST-${uuid}`;
+          const urnData = new this.urnModel({
+            urn: ifricId,
+            created_at: moment().format(),
+            last_updated_at: moment().format()
+          })
+          await urnData.save();
+          let urnResponse = await this.urnModel.find({urn: ifricId});
+          if(urnResponse.length > 0){
+            const assetData = new this.assetModel({
+              machine_serial_number: data.machine_serial_number,
+              urn_id: urnResponse[0].id,
+              created_at: moment().format(),
+              last_updated_at: moment().format()
+            })
+            await assetData.save();
+            return { status: 201, message: 'Asset created successfully', urn_id: ifricId };
+          } else{
+            return { status: 404, message: 'Urn ID does not exist' };
+          }
+        }else{
+          return { status: 400, message: 'Mahcine Serial Number already exists' };
+        }
+      }else{
+        let objectSubTypeResponse = await this.objectSubTypeModel.find({object_sub_type_code: data.object_sub_type_code.toUpperCase()});
         if(objectSubTypeResponse.length > 0){
           let objectTypeData = await this.ObjectTypeModel.findById(objectSubTypeResponse[0].object_type_id);
           if(objectTypeData && objectTypeData.object_type_code == data.object_type_code){
@@ -47,7 +75,7 @@ export class AssetService {
                   last_updated_at: moment().format()
                 })
                 await assetData.save();
-                return { status: 201, message: 'Asset created successfully' };
+                return { status: 201, message: 'Asset created successfully', urn_id: ifricId };
               } else{
                 return { status: 404, message: 'Urn ID does not exist' };
               }
@@ -60,6 +88,7 @@ export class AssetService {
         }else{
           return { status: 404, message: 'Object Sub Type Code does not exist' };
         }
+      }
     }catch(err){
       return err;
     }
