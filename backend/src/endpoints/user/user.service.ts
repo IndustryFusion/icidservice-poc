@@ -34,7 +34,7 @@ export class UserService {
             let response = await this.userModel.find({employee_code: data.employee_code});
             if(!(response.length > 0)){
               let uuid = uuidv5(data.employee_code, this.ifricId);
-              let ifricId = `urn:ifric:${data.dataspace_code}-${data.region_code}-${data.object_type_code}-${data.object_sub_type_code}-${uuid}`;
+              let ifricId = `urn:ifric:${data.dataspace_code.toLowerCase()}-${data.region_code.toLowerCase()}-${data.object_type_code.toLowerCase()}-${data.object_sub_type_code.toLowerCase()}-${uuid}`;
               const urnData = new this.urnModel({
                 urn: ifricId,
                 created_at: moment().format(),
