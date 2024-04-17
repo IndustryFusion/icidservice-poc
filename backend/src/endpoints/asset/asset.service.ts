@@ -52,7 +52,7 @@ export class AssetService {
               return { status: 404, message: 'Urn ID does not exist' };
             }
           }else{
-            return { status: 400, message: 'Mahcine Serial Number already exists' };
+            return { status: 400, message: 'Machine Serial Number already exists' };
           }
         }else{
           return { status: 400, message: 'Invalid Object Sub Type Code' };
