@@ -24,70 +24,41 @@ export class AssetService {
 
   async create(data: any) {
     try{
-      if(data.type && data.type == 'asset'){
-        let response = await this.assetModel.find({machine_serial_number: data.machine_serial_number});
-        if(!(response.length > 0)){
-          let uuid = uuidv5(data.machine_serial_number, this.ifricId);
-          let ifricId = `urn:ifric:IFX-EUR-NLD-AST-${uuid}`;
-          const urnData = new this.urnModel({
-            urn: ifricId,
-            created_at: moment().format(),
-            last_updated_at: moment().format()
-          })
-          await urnData.save();
-          let urnResponse = await this.urnModel.find({urn: ifricId});
-          if(urnResponse.length > 0){
-            const assetData = new this.assetModel({
-              machine_serial_number: data.machine_serial_number,
-              urn_id: urnResponse[0].id,
+      let objectSubTypeResponse = await this.objectSubTypeModel.find({object_sub_type_code: data.object_sub_type_code.toUpperCase()});
+      if(objectSubTypeResponse.length > 0){
+        let objectTypeData = await this.ObjectTypeModel.findById(objectSubTypeResponse[0].object_type_id);
+        if(objectTypeData && objectTypeData.object_type_code == data.object_type_code){
+          let response = await this.assetModel.find({machine_serial_number: data.machine_serial_number});
+          if(!(response.length > 0)){
+            let uuid = uuidv5(data.machine_serial_number, this.ifricId);
+            let ifricId = `urn:ifric:${data.dataspace_code.toLowerCase()}-${data.region_code.toLowerCase()}-${data.object_type_code.toLowerCase()}-${data.object_sub_type_code.toLowerCase()}-${uuid}`;
+            const urnData = new this.urnModel({
+              urn: ifricId,
               created_at: moment().format(),
               last_updated_at: moment().format()
             })
-            await assetData.save();
-            return { status: 201, message: 'Asset created successfully', urn_id: ifricId };
-          } else{
-            return { status: 404, message: 'Urn ID does not exist' };
-          }
-        }else{
-          return { status: 400, message: 'Mahcine Serial Number already exists' };
-        }
-      }else{
-        let objectSubTypeResponse = await this.objectSubTypeModel.find({object_sub_type_code: data.object_sub_type_code.toUpperCase()});
-        if(objectSubTypeResponse.length > 0){
-          let objectTypeData = await this.ObjectTypeModel.findById(objectSubTypeResponse[0].object_type_id);
-          if(objectTypeData && objectTypeData.object_type_code == data.object_type_code){
-            let response = await this.assetModel.find({machine_serial_number: data.machine_serial_number});
-            if(!(response.length > 0)){
-              let uuid = uuidv5(data.machine_serial_number, this.ifricId);
-              let ifricId = `urn:ifric:${data.dataspace_code}-${data.region_code}-${data.object_type_code}-${data.object_sub_type_code}-${uuid}`;
-              const urnData = new this.urnModel({
-                urn: ifricId,
+            await urnData.save();
+            let urnResponse = await this.urnModel.find({urn: ifricId});
+            if(urnResponse.length > 0){
+              const assetData = new this.assetModel({
+                machine_serial_number: data.machine_serial_number,
+                urn_id: urnResponse[0].id,
                 created_at: moment().format(),
                 last_updated_at: moment().format()
               })
-              await urnData.save();
-              let urnResponse = await this.urnModel.find({urn: ifricId});
-              if(urnResponse.length > 0){
-                const assetData = new this.assetModel({
-                  machine_serial_number: data.machine_serial_number,
-                  urn_id: urnResponse[0].id,
-                  created_at: moment().format(),
-                  last_updated_at: moment().format()
-                })
-                await assetData.save();
-                return { status: 201, message: 'Asset created successfully', urn_id: ifricId };
-              } else{
-                return { status: 404, message: 'Urn ID does not exist' };
-              }
-            }else{
-              return { status: 400, message: 'Mahcine Serial Number already exists' };
+              await assetData.save();
+              return { status: 201, message: 'Asset created successfully', urn_id: ifricId };
+            } else{
+              return { status: 404, message: 'Urn ID does not exist' };
             }
           }else{
-            return { status: 400, message: 'Invalid Object Sub Type Code' };
+            return { status: 400, message: 'Mahcine Serial Number already exists' };
           }
         }else{
-          return { status: 404, message: 'Object Sub Type Code does not exist' };
+          return { status: 400, message: 'Invalid Object Sub Type Code' };
         }
+      }else{
+        return { status: 404, message: 'Object Sub Type Code does not exist' };
       }
     }catch(err){
       return err;

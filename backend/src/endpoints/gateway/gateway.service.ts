@@ -62,7 +62,7 @@ export class GatewayService {
             let response = await this.serverModel.find({hardware_uuid: data.hardware_uuid});
             if(!response.length){
               let uuid = uuidv5(data.hardware_uuid + data.hardware_serial_number, this.ifricId);
-              let ifricId = `urn:ifric:${data.dataspace_code}-${data.region_code}-${data.object_type_code}-${data.object_sub_type_code}-${uuid}`;
+              let ifricId = `urn:ifric:${data.dataspace_code.toLowerCase()}-${data.region_code.toLowerCase()}-${data.object_type_code.toLowerCase()}-${data.object_sub_type_code.toLowerCase()}-${uuid}`;
               const urnData = new this.urnModel({
                 urn: ifricId,
                 created_at: moment().format(),
