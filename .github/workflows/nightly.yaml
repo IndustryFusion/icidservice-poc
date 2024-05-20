@@ -40,3 +40,5 @@ jobs:
       DOCKER_TAG: ${{ needs.build.outputs.DOCKER_TAG }}
     secrets:
       PRIVATE_GITHUB_TOKEN: ${{ secrets.PRIVATE_GITHUB_TOKEN }}
+      ICID_MONGO_URL: ${{ secrets.ICID_MONGO_URL }}
+      ICID_NAMESPACE: ${{ secrets.ICID_NAMESPACE }}
