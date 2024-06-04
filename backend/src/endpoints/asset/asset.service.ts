@@ -40,6 +40,7 @@ export class AssetService {
             await urnData.save();
             let urnResponse = await this.urnModel.find({urn: ifricId});
             if(urnResponse.length > 0){
+              console.log("AssetSave")
               const assetData = new this.assetModel({
                 machine_serial_number: data.machine_serial_number,
                 urn_id: urnResponse[0].id,
