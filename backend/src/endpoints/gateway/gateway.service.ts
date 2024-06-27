@@ -79,7 +79,7 @@ export class GatewayService {
                   last_updated_at: moment().format()
                 })
                 await serverData.save();
-                return { status: 201, message: 'Factory Server created successfully' };
+                return { status: 201, message: 'Factory Server created successfully', urn_id: ifricId };
               } else{
                 return { status: 404, message: 'Urn ID does not exist' };
               }

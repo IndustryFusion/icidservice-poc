@@ -69,7 +69,7 @@ export class CompanyService {
                   last_updated_at: moment().format()
                 })
                 await companyData.save();
-                return { status: 201, message: 'Company created successfully' };
+                return { status: 201, message: 'Company created successfully', urn_id: ifricId };
               } else{
                 return { status: 404, message: 'Urn ID does not exist' };
               }
