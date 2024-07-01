@@ -37,7 +37,9 @@ jobs:
     uses: IndustryFusion/GitOpsRepo/.github/workflows/deploy.yaml@main
     with:
       APPS: icid
+      NAMESPACE: iff50
       DOCKER_TAG: ${{ needs.build.outputs.DOCKER_TAG }}
+      CLUSTER: IFF-Dev-SmartFactory      
     secrets:
       PRIVATE_GITHUB_TOKEN: ${{ secrets.PRIVATE_GITHUB_TOKEN }}
       ICID_MONGO_URL_DEV: ${{ secrets.ICID_MONGO_URL_DEV }}
