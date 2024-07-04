@@ -23,7 +23,6 @@ export class CompanyController {
 
   @Post()
   create(@Body() data: any) {
-    console.log('inside create')
     return this.companyService.create(data);
   }
 
