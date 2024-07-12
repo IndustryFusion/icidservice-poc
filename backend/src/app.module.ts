@@ -30,7 +30,9 @@ const mongoURI = process.env.MONGO_URL;
 
 @Module({
   imports: [
-    MongooseModule.forRoot(mongoURI),
+    MongooseModule.forRoot(mongoURI,{
+      readPreference: 'secondaryPreferred' // This allows reads from secondaries if available
+    }),
     MongooseModule.forFeature([
       { name: Company.name, schema: CompanySchema },
       { name: Country.name, schema: CountrySchema },
