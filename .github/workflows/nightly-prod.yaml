@@ -1,4 +1,4 @@
-name: Nigthly
+name: Nigthly-prod
 
 on:
   schedule:
@@ -34,13 +34,11 @@ jobs:
           echo "NIGHTLY_DOCKER_TAG=${NIGHTLY_DOCKER_TAG}" >> "${GITHUB_OUTPUT}"
   deploy:
     needs: build
-    uses: IndustryFusion/GitOpsRepo/.github/workflows/deploy.yaml@main
+    uses: IndustryFusion/GitOpsRepo/.github/workflows/deploy-prod.yaml@main
     with:
-      APPS: icid
-      NAMESPACE: iff50
+      APPS: icid_prod
       DOCKER_TAG: ${{ needs.build.outputs.DOCKER_TAG }}
-      CLUSTER: IFF-Dev-SmartFactory      
     secrets:
       PRIVATE_GITHUB_TOKEN: ${{ secrets.PRIVATE_GITHUB_TOKEN }}
-      ICID_MONGO_URL_DEV: ${{ secrets.ICID_MONGO_URL_DEV }}
+      ICID_MONGO_URL: ${{ secrets.ICID_MONGO_URL }}
       ICID_NAMESPACE: ${{ secrets.ICID_NAMESPACE }}
