@@ -40,6 +40,8 @@ import { CompanyController } from './endpoints/company/company.controller';
 import { CompanyService } from './endpoints/company/company.service';
 import { UserController } from './endpoints/user/user.controller';
 import { UserService } from './endpoints/user/user.service';
+import { CertificateController } from './endpoints/certificate/certificate.controller';
+import { CertificateService } from './endpoints/certificate/certificate.service';
 
 dotenv.config();
 const mongoURI = process.env.MONGO_URL;
@@ -69,7 +71,8 @@ const mongoURI = process.env.MONGO_URL;
     AssetController,
     GatewayController,
     CompanyController,
-    UserController
+    UserController,
+    CertificateController
   ],
   providers: [
     AppService,
@@ -77,7 +80,8 @@ const mongoURI = process.env.MONGO_URL;
     AssetService,
     GatewayService,
     CompanyService,
-    UserService
+    UserService,
+    CertificateService
   ],
 })
 export class AppModule {}
