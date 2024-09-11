@@ -32,5 +32,15 @@ EXPOSE 4010
 # Install application dependencies
 RUN npm install
 
-# Start the Nest.js application
-CMD ["npm", "run", "start"]
+# Define a build argument with a default value "dev"
+ARG ENV=dev
+
+# Set environment variable in the container
+ENV NODE_ENV=$ENV
+
+# Conditionally run build command based on the ENV argument
+RUN if [ "$ENV" = "prod" ]; then \
+    npm run build; \
+    fi
+
+CMD ["/bin/sh", "-c", "if [ \"$NODE_ENV\" = \"prod\" ]; then npm run start:prod; else npm run start:dev; fi"]

@@ -1,0 +1,11 @@
+version: '3.7'
+
+services:
+  icid-backend:
+    image: ${DOCKER_PREFIX:-ifx40}/icid-backend:${DOCKER_TAG:-latest}
+    build:
+      context: ./backend
+      args:
+        ENV: prod
+    ports:
+    - "4010:4010"
