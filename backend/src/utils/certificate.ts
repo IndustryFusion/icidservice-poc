@@ -85,7 +85,7 @@ export function verifyCertificate(certPem: string) {
     const now = new Date();
 
     // Check if the certificate is expired
-    if (now < cert.validity.notBefore || now > cert.validity.notAfter) {
+    if (now > cert.validity.notAfter) { // If have no limit for cert expiry date, once implementd we need to add this condtion || now < cert.validity.notBefore 
       throw new Error('Certificate is expired or not yet valid');
     }
 
