@@ -59,134 +59,129 @@ export class ScriptService {
   ) {}
 
   async create() {
-    try{
-
-      const dataSpaceData = new this.dataSpaceModel({
-        dataSpace_code: "IFX" ,  
-        dataSpace_name: "IndustryFusion-X",
-        created_at: moment().format(),
-        last_updated_at: moment().format()
-      });
-      await dataSpaceData.save();
+    try {
+      // Check if DataSpace already exists
+      let dataSpace = await this.dataSpaceModel.findOne({ dataSpace_code: "IFX" });
       
-      let response = await this.dataSpaceModel.find({dataSpace_code: "IFX"});
-      console.log('response for data space ',response);
-      if(response.length > 0){
+      if (!dataSpace) {
+        const dataSpaceData = new this.dataSpaceModel({
+          dataSpace_code: "IFX",
+          dataSpace_name: "IndustryFusion-X",
+          created_at: moment().format(),
+          last_updated_at: moment().format()
+        });
+        dataSpace = await dataSpaceData.save();
+      }
+  
+      // Regions
+      let existingRegions = await this.regionModel.find({ dataSpace_id: dataSpace.id });
+      if (existingRegions.length === 0) {
         let regionData = [{
           region_code: "EUR",  
           region_name: "Europe",
-          dataSpace_id: response[0].id,
+          dataSpace_id: dataSpace.id,
           created_at: moment().format(),
           last_updated_at: moment().format()
-        },{
-          region_code: "NAR",  
+        }, {
+          region_code: "NAR",
           region_name: "North America",
-          dataSpace_id: response[0].id,
+          dataSpace_id: dataSpace.id,
           created_at: moment().format(),
           last_updated_at: moment().format()
-        },{
-          region_code: "SAR",  
+        }, {
+          region_code: "SAR",
           region_name: "South America",
-          dataSpace_id: response[0].id,
+          dataSpace_id: dataSpace.id,
           created_at: moment().format(),
           last_updated_at: moment().format()
-        },{
-          region_code: "ASA",  
+        }, {
+          region_code: "ASA",
           region_name: "Asia",
-          dataSpace_id: response[0].id,
+          dataSpace_id: dataSpace.id,
           created_at: moment().format(),
           last_updated_at: moment().format()
-        },{
-          region_code: "AFR",  
+        }, {
+          region_code: "AFR",
           region_name: "Africa",
-          dataSpace_id: response[0].id,
+          dataSpace_id: dataSpace.id,
           created_at: moment().format(),
           last_updated_at: moment().format()
-        },{
-          region_code: "AUS",  
+        }, {
+          region_code: "AUS",
           region_name: "Australia",
-          dataSpace_id: response[0].id,
+          dataSpace_id: dataSpace.id,
           created_at: moment().format(),
           last_updated_at: moment().format()
         }];
         await this.regionModel.insertMany(regionData);
       }
-      
-      const countryData = Object.keys(countries).map(key => ({
-        country_code: key,
-        country_name: countries[key].name,
-        created_at: moment().format(),
-        last_updated_at: moment().format()
-      }));
-      await this.countryModel.insertMany(countryData);
-
-      const objectTypeData = [{
-          object_type_code: "HWR",   
-          object_type_name: "Hardware",
+  
+      // Countries
+      let countryCount = await this.countryModel.countDocuments();
+      if (countryCount === 0) {
+        const countryData = Object.keys(countries).map(key => ({
+          country_code: key,
+          country_name: countries[key].name,
           created_at: moment().format(),
           last_updated_at: moment().format()
-        },{
-          object_type_code: "NLD" ,
-          object_type_name: "NGSI-LD",
+        }));
+        await this.countryModel.insertMany(countryData);
+      }
+  
+      // Object Types
+      const objectTypeList = ["HWR", "NLD", "COM", "CON"];
+      const existingObjectTypes = await this.objectTypeModel.find({ object_type_code: { $in: objectTypeList } });
+      const objectTypeData = [
+        { object_type_code: "HWR", object_type_name: "Hardware" },
+        { object_type_code: "NLD", object_type_name: "NGSI-LD" },
+        { object_type_code: "COM", object_type_name: "Company" },
+        { object_type_code: "CON", object_type_name: "Contract" }
+      ].filter(type => !existingObjectTypes.some(existingType => existingType.object_type_code === type.object_type_code));
+  
+      if (objectTypeData.length > 0) {
+        const objectTypeRecords = objectTypeData.map(type => ({
+          ...type,
           created_at: moment().format(),
           last_updated_at: moment().format()
-        },{
-          object_type_code: "COM",
-          object_type_name: "Company",
-          created_at: moment().format(),
-          last_updated_at: moment().format()
-        }]
-      await this.objectTypeModel.insertMany(objectTypeData);
-
+        }));
+        await this.objectTypeModel.insertMany(objectTypeRecords);
+      }
+  
+      // Object Subtypes
       let objectSubTypeData = [
-        {
-          object_sub_type_code: "AST",
-          object_sub_type_name: "Asset",
-          object_type_id: "NLD",
-          created_at: moment().format(),
-          last_updated_at: moment().format()
-        },{
-          object_sub_type_code: "USR",
-          object_sub_type_name: "User",
-          object_type_id: "NLD",
-          created_at: moment().format(),
-          last_updated_at: moment().format()
-        },{
-          object_sub_type_code: "GTW",
-          object_sub_type_name: "Gateway",
-          object_type_id: "HWR",
-          created_at: moment().format(),
-          last_updated_at: moment().format()
-        },{
-          object_sub_type_code: "FSV",
-          object_sub_type_name: "Factory Server",
-          object_type_id: "HWR",
-          created_at: moment().format(),
-          last_updated_at: moment().format()
-        },{
-          object_sub_type_code: "NAP",
-          object_sub_type_name: "Not Applicable",
-          object_type_id: "COM",
-          created_at: moment().format(),
-          last_updated_at: moment().format()
-        }
-      ]
-
-      for(let i = 0; i < objectSubTypeData.length; i++){
-        const response = await this.objectTypeModel.find({object_type_code: objectSubTypeData[i].object_type_id});
-        if(response.length > 0){
-          objectSubTypeData[i].object_type_id = response[0].id;
-          const objectSubTypeValues = new this.objectSubTypeModel(objectSubTypeData[i]);
-          await objectSubTypeValues.save();
+        { object_sub_type_code: "AST", object_sub_type_name: "Asset", object_type_id: "NLD" },
+        { object_sub_type_code: "USR", object_sub_type_name: "User", object_type_id: "NLD" },
+        { object_sub_type_code: "GTW", object_sub_type_name: "Gateway", object_type_id: "HWR" },
+        { object_sub_type_code: "FSV", object_sub_type_name: "Factory Server", object_type_id: "HWR" },
+        { object_sub_type_code: "NAP", object_sub_type_name: "Not Applicable", object_type_id: "COM" },
+        { object_sub_type_code: "DEF", object_sub_type_name: "Contract definition", object_type_id: "CON" },
+        { object_sub_type_code: "BND", object_sub_type_name: "Contract binding", object_type_id: "CON" }
+      ];
+  
+      for (let i = 0; i < objectSubTypeData.length; i++) {
+        const objectType = await this.objectTypeModel.findOne({ object_type_code: objectSubTypeData[i].object_type_id });
+        if (objectType) {
+          objectSubTypeData[i].object_type_id = objectType.id;
+  
+          const existingSubType = await this.objectSubTypeModel.findOne({ object_sub_type_code: objectSubTypeData[i].object_sub_type_code });
+          if (!existingSubType) {
+            const objectSubTypeValues = new this.objectSubTypeModel({
+              ...objectSubTypeData[i],
+              created_at: moment().format(),
+              last_updated_at: moment().format()
+            });
+            await objectSubTypeValues.save();
+          }
         }
       }
-      console.log('objectSubTypeData ',objectSubTypeData);
+  
+      console.log('objectSubTypeData saved successfully');
       return {
         success: true,
         status: 201,
         message: "Data added successfully"
-      }
-    }catch(err){
+      };
+    } catch(err) {
       throw err;
     }
   }
