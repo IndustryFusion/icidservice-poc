@@ -21,6 +21,7 @@ import { Urn } from 'src/schemas/urn.schema';
 import { Asset } from 'src/schemas/asset.schema';
 import { ObjectSubType } from 'src/schemas/objectSubType.schema';
 import { ObjectType } from 'src/schemas/objectType.schema';
+import { Region } from 'src/schemas/region.schema';
 import { v5 as uuidv5, validate as uuidValidate } from 'uuid';
 import * as moment from 'moment';
 
@@ -34,7 +35,9 @@ export class AssetService {
     @InjectModel(ObjectSubType.name)
     private objectSubTypeModel: Model<ObjectSubType>,
     @InjectModel(ObjectType.name)
-    private ObjectTypeModel: Model<ObjectType>
+    private ObjectTypeModel: Model<ObjectType>,
+    @InjectModel(Region.name)
+    private regionModel: Model<Region>
   ) {}
   private readonly ifricId = process.env.IFRIC_NAMESPACE;
 
@@ -47,6 +50,12 @@ export class AssetService {
           let response = await this.assetModel.find({machine_serial_number: data.machine_serial_number});
           if(!(response.length > 0)){
             let uuid = uuidv5(data.machine_serial_number, this.ifricId);
+            const regionData = await this.regionModel.find();
+            regionData.forEach(value => {
+              if(value.region_code.startsWith(data.region_code)) {
+                data.region_code = value.region_code;
+              }
+            })
             let ifricId = `urn:ifric:${data.dataspace_code.toLowerCase()}-${data.region_code.toLowerCase()}-${data.object_type_code.toLowerCase()}-${data.object_sub_type_code.toLowerCase()}-${uuid}`;
             const urnData = new this.urnModel({
               urn: ifricId,
