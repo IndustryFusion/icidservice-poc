@@ -30,6 +30,8 @@ import { RegionSchema, Region } from 'src/schemas/region.schema';
 import { ServerSchema, Server } from 'src/schemas/server.schema';
 import { UrnSchema, Urn } from 'src/schemas/urn.schema';
 import { UserSchema, User } from 'src/schemas/user.schema';
+import { Contract, ContractSchema } from './schemas/contract.schema';
+import { Binding, BindingSchema } from './schemas/binding.schema';
 import { ScriptController } from './endpoints/script/script.controller';
 import { ScriptService } from './endpoints/script/script.service';
 import { AssetController } from './endpoints/asset/asset.controller';
@@ -42,6 +44,8 @@ import { UserController } from './endpoints/user/user.controller';
 import { UserService } from './endpoints/user/user.service';
 import { CertificateController } from './endpoints/certificate/certificate.controller';
 import { CertificateService } from './endpoints/certificate/certificate.service';
+import { ContractController } from './endpoints/contract/contract.controller';
+import { ContractService } from './endpoints/contract/contract.service';
 
 dotenv.config();
 const mongoURI = process.env.MONGO_URL;
@@ -63,6 +67,8 @@ const mongoURI = process.env.MONGO_URL;
       { name: Server.name, schema: ServerSchema },
       { name: Urn.name, schema: UrnSchema },
       { name: User.name, schema: UserSchema },
+      { name: Contract.name, schema: ContractSchema },
+      { name: Binding.name, schema: BindingSchema }
     ]),
   ],
   controllers: [
@@ -72,7 +78,8 @@ const mongoURI = process.env.MONGO_URL;
     GatewayController,
     CompanyController,
     UserController,
-    CertificateController
+    CertificateController,
+    ContractController
   ],
   providers: [
     AppService,
@@ -81,7 +88,8 @@ const mongoURI = process.env.MONGO_URL;
     GatewayService,
     CompanyService,
     UserService,
-    CertificateService
+    CertificateService,
+    ContractService
   ],
 })
 export class AppModule {}

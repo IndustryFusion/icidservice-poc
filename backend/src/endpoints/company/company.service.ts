@@ -20,6 +20,7 @@ import { Company } from 'src/schemas/company.schema';
 import { ObjectSubType } from 'src/schemas/objectSubType.schema';
 import { ObjectType } from 'src/schemas/objectType.schema';
 import { Urn } from 'src/schemas/urn.schema';
+import { Region } from 'src/schemas/region.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { v5 as uuidv5, validate as uuidValidate } from 'uuid';
@@ -37,7 +38,9 @@ export class CompanyService {
     @InjectModel(ObjectSubType.name)
     private objectSubTypeModel: Model<ObjectSubType>,
     @InjectModel(ObjectType.name)
-    private ObjectTypeModel: Model<ObjectType>
+    private ObjectTypeModel: Model<ObjectType>,
+    @InjectModel(Region.name)
+    private regionModel: Model<Region>
   ) {}
   private readonly ifricId = process.env.IFRIC_NAMESPACE;
 
@@ -52,6 +55,12 @@ export class CompanyService {
             let response = await this.companyModel.find({registration_code: data.registration_code});
             if(!response.length){
               let uuid = uuidv5(data.country_code.toUpperCase() + data.registration_code, this.ifricId);
+              const regionData = await this.regionModel.find();
+              regionData.forEach(value => {
+                if(value.region_code.startsWith(data.region_code)) {
+                  data.region_code = value.region_code;
+                }
+              })
               let ifricId = `urn:ifric:${data.dataspace_code.toLowerCase()}-${data.region_code.toLowerCase()}-${data.object_type_code.toLowerCase()}-${data.object_sub_type_code.toLowerCase()}-${uuid}`;
               const urnData = new this.urnModel({
                 urn: ifricId,
