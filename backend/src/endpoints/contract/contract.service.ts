@@ -7,6 +7,7 @@ import { v5 as uuidv5, validate as uuidValidate } from 'uuid';
 import * as moment from 'moment';
 import { Contract } from 'src/schemas/contract.schema';
 import { Binding } from 'src/schemas/binding.schema';
+import { Region } from 'src/schemas/region.schema';
 
 @Injectable()
 export class ContractService {
@@ -16,7 +17,9 @@ export class ContractService {
     @InjectModel(Contract.name)
     private contractModel: Model<Contract>,
     @InjectModel(Binding.name)
-    private bindingModel: Model<Binding>
+    private bindingModel: Model<Binding>,
+    @InjectModel(Region.name)
+    private regionModel: Model<Region>
   ) {}
   private readonly ifricId = process.env.IFRIC_NAMESPACE;
   private readonly contractCode = process.env.CONTRACT_DEFAULT_CODE;
@@ -27,6 +30,12 @@ export class ContractService {
       let uuid = uuidv5(data.data_provider_company_ifric_id, this.ifricId);
       let bindingCodeArr = this.bindingCode.split('-');
       let region_code = data.data_provider_company_ifric_id.split("-")[1];
+      const regionData = await this.regionModel.find();
+      regionData.forEach(value => {
+        if(value.region_code.startsWith(region_code)) {
+          region_code = value.region_code;
+        }
+      })
       let ifricId = `urn:ifric:${bindingCodeArr[0].toLowerCase()}-${region_code}-${bindingCodeArr[1].toLowerCase()}-${bindingCodeArr[2].toLowerCase()}-${uuid}`;
       const urnData = new this.urnModel({
         urn: ifricId,
