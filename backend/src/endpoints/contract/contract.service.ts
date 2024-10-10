@@ -27,16 +27,16 @@ export class ContractService {
 
   async createBinding(data: CreateBindingDto) {
     try {
-      let uuid = uuidv5(data.data_provider_company_ifric_id, this.ifricId);
+      let uuid = uuidv5(data.data_provider_company_ifric_id + data.data_consumer_company_ifric_id + new Date().toISOString(), this.ifricId);
       let bindingCodeArr = this.bindingCode.split('-');
-      let region_code = data.data_provider_company_ifric_id.split("-")[1];
+      let region_code = data.data_provider_company_ifric_id.split("-")[1].toUpperCase();
       const regionData = await this.regionModel.find();
       regionData.forEach(value => {
         if(value.region_code.startsWith(region_code)) {
           region_code = value.region_code;
         }
       })
-      let ifricId = `urn:ifric:${bindingCodeArr[0].toLowerCase()}-${region_code}-${bindingCodeArr[1].toLowerCase()}-${bindingCodeArr[2].toLowerCase()}-${uuid}`;
+      let ifricId = `urn:ifric:${bindingCodeArr[0].toLowerCase()}-${region_code.toLowerCase()}-${bindingCodeArr[1].toLowerCase()}-${bindingCodeArr[2].toLowerCase()}-${uuid}`;
       const urnData = new this.urnModel({
         urn: ifricId,
         created_at: moment().format(),
@@ -61,10 +61,16 @@ export class ContractService {
 
   async createContract(data: CreateContractDto) {
     try {
-      let uuid = uuidv5(data.data_consumer_company_ifric_id, this.ifricId);
+      let uuid = uuidv5(data.data_consumer_company_ifric_id + new Date().toISOString(), this.ifricId);
       let contractCodeArr = this.contractCode.split('-');
-      let region_code = data.data_consumer_company_ifric_id.split("-")[1];
-      let ifricId = `urn:ifric:${contractCodeArr[0].toLowerCase()}-${region_code}-${contractCodeArr[1].toLowerCase()}-${contractCodeArr[2].toLowerCase()}-${uuid}`;
+      let region_code = data.data_consumer_company_ifric_id.split("-")[1].toUpperCase();
+      const regionData = await this.regionModel.find();
+      regionData.forEach(value => {
+        if(value.region_code.startsWith(region_code)) {
+          region_code = value.region_code;
+        }
+      })
+      let ifricId = `urn:ifric:${contractCodeArr[0].toLowerCase()}-${region_code.toLowerCase()}-${contractCodeArr[1].toLowerCase()}-${contractCodeArr[2].toLowerCase()}-${uuid}`;
       const urnData = new this.urnModel({
         urn: ifricId,
         created_at: moment().format(),
