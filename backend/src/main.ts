@@ -14,19 +14,26 @@
 // limitations under the License. 
 // 
 
+import * as dotenv from 'dotenv';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import * as dotenv from 'dotenv';
 import * as cors from 'cors';
 import * as cookieParser from 'cookie-parser';
 
+dotenv.config();
+
 async function bootstrap() {
-  dotenv.config();
   const app = await NestFactory.create(AppModule);
+
+  // Split CORS_ORIGIN values by comma to handle multiple origins
+  const allowedOrigins = process.env.CORS_ORIGIN?.split(',') || [];
+
+  // Using NestJS built-in CORS support with multiple origins from CORS_ORIGIN env
   app.use(cors({
-    origin: [process.env.FLEET_MANAGER_BACKEND_URL, process.env.IFRIC_PLATFORM_BACKEND_URL, process.env.IFRIC_REGISTRY_BACKEND_URL, process.env.IFX_PLATFORM_BACKEND_URL],
+    origin: allowedOrigins,
     credentials: true,
   }));
+
   app.use(cookieParser());
   await app.listen(4010);
 }
