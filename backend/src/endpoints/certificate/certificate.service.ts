@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { generatePrivateKey, createCSR, generateClientCertificate, verifyCertificate } from '../../utils/certificate';
+import { HttpException, HttpStatus } from '@nestjs/common';
 
 @Injectable()
 export class CertificateService {
@@ -17,7 +18,13 @@ export class CertificateService {
 
       return clientCert;
     } catch(err) {
-      throw err;
+      if (err instanceof HttpException) {
+        throw err;
+      } else if(err.response) {
+        throw new HttpException(err.response.data.message, err.response.status);
+      } else {
+        throw new HttpException(err.message, HttpStatus.INTERNAL_SERVER_ERROR);
+      }
     }
   }
 
@@ -33,7 +40,13 @@ export class CertificateService {
       
       return clientCert;
     } catch(err) {
-      throw err;
+      if (err instanceof HttpException) {
+        throw err;
+      } else if(err.response) {
+        throw new HttpException(err.response.data.message, err.response.status);
+      } else {
+        throw new HttpException(err.message, HttpStatus.INTERNAL_SERVER_ERROR);
+      }
     }
   }
 
@@ -42,7 +55,13 @@ export class CertificateService {
       const formattedCertData = certificate_data.replace(/\\r\\n/g, '\n');
       return verifyCertificate(formattedCertData);
     } catch(err) {
-      throw err;
+      if (err instanceof HttpException) {
+        throw err;
+      } else if(err.response) {
+        throw new HttpException(err.response.data.message, err.response.status);
+      } else {
+        throw new HttpException(err.message, HttpStatus.INTERNAL_SERVER_ERROR);
+      }
     }
   }
 }

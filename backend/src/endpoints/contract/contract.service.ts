@@ -8,6 +8,7 @@ import * as moment from 'moment';
 import { Contract } from 'src/schemas/contract.schema';
 import { Binding } from 'src/schemas/binding.schema';
 import { Region } from 'src/schemas/region.schema';
+import { HttpException, HttpStatus } from '@nestjs/common';
 
 @Injectable()
 export class ContractService {
@@ -55,7 +56,13 @@ export class ContractService {
       await bindingData.save();
       return { status: 201, message: 'Binding created successfully', urn_id: ifricId };
     } catch(err) {
-      throw new InternalServerErrorException(`Failed to create binding: ${err.message}`);
+      if (err instanceof HttpException) {
+        throw err;
+      } else if(err.response) {
+        throw new HttpException(err.response.data.message, err.response.status);
+      } else {
+        throw new HttpException(err.message, HttpStatus.INTERNAL_SERVER_ERROR);
+      }
     }
   }
 
@@ -87,7 +94,13 @@ export class ContractService {
       await contractData.save();
       return { status: 201, message: 'Contract created successfully', urn_id: ifricId };
     } catch(err) {
-      throw new InternalServerErrorException(`Failed to create contract: ${err.message}`);
+      if (err instanceof HttpException) {
+        throw err;
+      } else if(err.response) {
+        throw new HttpException(err.response.data.message, err.response.status);
+      } else {
+        throw new HttpException(err.message, HttpStatus.INTERNAL_SERVER_ERROR);
+      }
     }
   }
 }
