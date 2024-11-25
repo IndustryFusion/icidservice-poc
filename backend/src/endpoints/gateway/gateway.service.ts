@@ -8,6 +8,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { v5 as uuidv5, validate as uuidValidate } from 'uuid';
 import * as moment from 'moment';
+import { HttpException, HttpStatus } from '@nestjs/common';
 
 @Injectable()
 export class GatewayService {
@@ -81,20 +82,26 @@ export class GatewayService {
                 await serverData.save();
                 return { status: 201, message: 'Factory Server created successfully', urn_id: ifricId };
               } else{
-                return { status: 404, message: 'Urn ID does not exist' };
+                throw new HttpException("Urn ID does not exist", HttpStatus.NOT_FOUND);
               }
             }else{
-              return { status: 400, message: 'hardware already exists In Factory Server' };
+              throw new HttpException("hardware already exists In Factory Server", HttpStatus.BAD_REQUEST);
             }
           }
         }else{
-          return { status: 400, message: 'Invalid Object Sub Type Code' };
+          throw new HttpException("Invalid Object Sub Type Code", HttpStatus.BAD_REQUEST);
         }
       }else{
-        return { status: 404, message: 'Object Sub Type Code does not exist' };
+        throw new HttpException("Object Sub Type Code does not exist", HttpStatus.NOT_FOUND);
       }
     }catch(err){
-      return err;
+      if (err instanceof HttpException) {
+        throw err;
+      }  else if(err.response) {
+        throw new HttpException(err.response.data.message, err.response.status);
+      } else {
+        throw new HttpException(err.message, HttpStatus.INTERNAL_SERVER_ERROR);
+      }
     }
   }
 

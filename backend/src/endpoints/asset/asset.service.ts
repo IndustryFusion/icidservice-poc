@@ -24,6 +24,7 @@ import { ObjectType } from 'src/schemas/objectType.schema';
 import { Region } from 'src/schemas/region.schema';
 import { v5 as uuidv5, validate as uuidValidate } from 'uuid';
 import * as moment from 'moment';
+import { HttpException, HttpStatus } from '@nestjs/common';
 
 @Injectable()
 export class AssetService {
@@ -74,19 +75,25 @@ export class AssetService {
               await assetData.save();
               return { status: 201, message: 'Asset created successfully', urn_id: ifricId };
             } else{
-              return { status: 404, message: 'Urn ID does not exist' };
+              throw new HttpException("Urn ID does not exist", HttpStatus.NOT_FOUND);
             }
           }else{
-            return { status: 400, message: 'Machine Serial Number already exists' };
+            throw new HttpException("Machine Serial Number already exists", HttpStatus.CONFLICT);
           }
         }else{
-          return { status: 400, message: 'Invalid Object Sub Type Code' };
+          throw new HttpException("Invalid Object Sub Type Code", HttpStatus.BAD_REQUEST);
         }
       }else{
-        return { status: 404, message: 'Object Sub Type Code does not exist' };
+        throw new HttpException("Object Sub Type Code does not exist", HttpStatus.NOT_FOUND);
       }
     }catch(err){
-      return { status: 500, message: err };
+      if (err instanceof HttpException) {
+        throw err;
+      } else if(err.response) {
+        throw new HttpException(err.response.data.message, err.response.status);
+      } else {
+        throw new HttpException(err.message, HttpStatus.INTERNAL_SERVER_ERROR);
+      }
     }
   }
 
