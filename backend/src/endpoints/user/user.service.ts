@@ -24,6 +24,7 @@ import { ObjectSubType } from 'src/schemas/objectSubType.schema';
 import { Company } from 'src/schemas/company.schema';
 import { v5 as uuidv5, validate as uuidValidate } from 'uuid';
 import * as moment from 'moment';
+import { CreateUserDto } from './dto/create.dto';
 
 @Injectable()
 export class UserService {
@@ -41,7 +42,7 @@ export class UserService {
   ) {}
   private readonly ifricId = process.env.IFRIC_NAMESPACE;
 
-  async create(data: any) {
+  async create(data: CreateUserDto) {
     try{
       let objectSubTypeResponse = await this.objectSubTypeModel.find({object_sub_type_code: data.object_sub_type_code});
         if(objectSubTypeResponse.length > 0){
@@ -49,7 +50,7 @@ export class UserService {
           if(objectTypeData && objectTypeData.object_type_code == data.object_type_code){
             let response = await this.userModel.find({employee_code: data.employee_code});
             if(!(response.length > 0)){
-              let uuid = uuidv5(data.employee_code, this.ifricId);
+              let uuid = uuidv5(`${data.employee_code}-${data.registration_number}`, this.ifricId);
               let ifricId = `urn:ifric:${data.dataspace_code.toLowerCase()}-${data.region_code.toLowerCase()}-${data.object_type_code.toLowerCase()}-${data.object_sub_type_code.toLowerCase()}-${uuid}`;
               const urnData = new this.urnModel({
                 urn: ifricId,

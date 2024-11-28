@@ -25,6 +25,7 @@ import { Region } from 'src/schemas/region.schema';
 import { v5 as uuidv5, validate as uuidValidate } from 'uuid';
 import * as moment from 'moment';
 import { HttpException, HttpStatus } from '@nestjs/common';
+import { CreateAssetDto } from './dto/create.dto';
 
 @Injectable()
 export class AssetService {
@@ -42,7 +43,7 @@ export class AssetService {
   ) {}
   private readonly ifricId = process.env.IFRIC_NAMESPACE;
 
-  async create(data: any) {
+  async create(data: CreateAssetDto) {
     try{
       let objectSubTypeResponse = await this.objectSubTypeModel.find({object_sub_type_code: data.object_sub_type_code.toUpperCase()});
       if(objectSubTypeResponse.length > 0){
@@ -50,7 +51,7 @@ export class AssetService {
         if(objectTypeData && objectTypeData.object_type_code == data.object_type_code){
           let response = await this.assetModel.find({machine_serial_number: data.machine_serial_number});
           if(!(response.length > 0)){
-            let uuid = uuidv5(data.machine_serial_number, this.ifricId);
+            let uuid = uuidv5(`${data.machine_serial_number}-${data.registration_number}`, this.ifricId);
             const regionData = await this.regionModel.find();
             regionData.forEach(value => {
               if(value.region_code.startsWith(data.region_code)) {
@@ -109,7 +110,23 @@ export class AssetService {
     return `This action updates a #${id} asset`;
   }
 
-  remove(id: string) {
-    return `This action removes a #${id} asset`;
+  async remove(id: string) {
+    try {
+      const urnData = await this.urnModel.find({urn: id});
+      console.log("urn data ",urnData);
+      if(urnData.length) {
+        await this.urnModel.deleteOne({urn: id});
+        await this.assetModel.deleteOne({urn_id: urnData[0].id});
+      }
+      return {status: 204, message: "asset id deleted successfully"};
+    } catch(err) {
+      if (err instanceof HttpException) {
+        throw err;
+      } else if(err.response) {
+        throw new HttpException(err.response.data.message, err.response.status);
+      } else {
+        throw new HttpException(err.message, HttpStatus.INTERNAL_SERVER_ERROR);
+      }
+    }
   }
 }
