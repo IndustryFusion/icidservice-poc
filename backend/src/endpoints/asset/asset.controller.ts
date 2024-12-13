@@ -16,12 +16,54 @@
 
 import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
 import { AssetService } from './asset.service';
+import { ApiBody } from '@nestjs/swagger';
 
 @Controller('asset')
 export class AssetController {
   constructor(private readonly assetService: AssetService) {}
 
   @Post()
+  @ApiBody({
+    description: 'Asset creation details',
+    required: true,
+    schema: {
+      type: 'object',
+      properties: {
+        dataspace_code: {
+          type: 'string',
+          example: 'DS001',
+        },
+        region_code: {
+          type: 'string',
+          example: 'US-WEST',
+        },
+        object_type_code: {
+          type: 'string',
+          example: 'TYPE123',
+        },
+        object_sub_type_code: {
+          type: 'string',
+          example: 'SUBTYPE456',
+        },
+        machine_serial_number: {
+          type: 'string',
+          example: 'SN1234567890',
+        },
+        registration_number: {
+          type: 'string',
+          example: 'REG12345',
+        },
+      },
+      required: [
+        'dataspace_code',
+        'region_code',
+        'object_type_code',
+        'object_sub_type_code',
+        'machine_serial_number',
+        'registration_number',
+      ],
+    },
+  })  
   create(@Body() data: any) {
     return this.assetService.create(data);
   }
@@ -37,6 +79,39 @@ export class AssetController {
   }
 
   @Patch(':id')
+  @ApiBody({
+    description: 'Asset creation details',
+    required: true,
+    schema: {
+      type: 'object',
+      properties: {
+        dataspace_code: {
+          type: 'string',
+          example: 'DS001',
+        },
+        region_code: {
+          type: 'string',
+          example: 'US-WEST',
+        },
+        object_type_code: {
+          type: 'string',
+          example: 'TYPE123',
+        },
+        object_sub_type_code: {
+          type: 'string',
+          example: 'SUBTYPE456',
+        },
+        machine_serial_number: {
+          type: 'string',
+          example: 'SN1234567890',
+        },
+        registration_number: {
+          type: 'string',
+          example: 'REG12345',
+        },
+      },
+    },
+  })  
   update(@Param('id') id: string, @Body() data: any) {
     return this.assetService.update(id);
   }

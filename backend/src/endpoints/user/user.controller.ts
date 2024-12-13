@@ -16,12 +16,59 @@
 
 import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
 import { UserService } from './user.service';
+import { ApiBody } from '@nestjs/swagger';
 
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Post()
+  @ApiBody({
+    description: 'Create User details',
+    required: true,
+    schema: {
+      type: 'object',
+      properties: {
+        employee_code: {
+          type: 'string',
+          example: 'EMP123456',
+        },
+        company_id: {
+          type: 'string',
+          example: 'C78910',
+        },
+        dataspace_code: {
+          type: 'string',
+          example: 'DS001',
+        },
+        region_code: {
+          type: 'string',
+          example: 'US-WEST',
+        },
+        object_type_code: {
+          type: 'string',
+          example: 'TYPE123',
+        },
+        object_sub_type_code: {
+          type: 'string',
+          example: 'SUBTYPE456',
+        },
+        registration_number: {
+          type: 'string',
+          example: 'REG12345',
+        },
+      },
+      required: [
+        'employee_code',
+        'company_id',
+        'dataspace_code',
+        'region_code',
+        'object_type_code',
+        'object_sub_type_code',
+        'registration_number',
+      ],
+    },
+  })
   create(@Body() data: any) {
     return this.userService.create(data);
   }
