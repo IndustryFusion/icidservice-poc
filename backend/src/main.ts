@@ -19,6 +19,7 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import * as cors from 'cors';
 import * as cookieParser from 'cookie-parser';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 dotenv.config();
 
@@ -35,6 +36,22 @@ async function bootstrap() {
   }));
 
   app.use(cookieParser());
+
+    // Swagger Configuration
+    const config = new DocumentBuilder()
+    .setTitle('Icid  Service')
+    .setDescription('The API responsible for unique registration, identification and certification of Industry Fusion Assets')
+    .setVersion('0.7.0')
+    .addBearerAuth(
+      {type: 'http',
+      scheme: 'bearer',
+      bearerFormat: 'JWT',},
+      'access-token',)
+    .build();
+
+  const document = SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('api-docs', app, document);
+
   await app.listen(4010);
 }
 bootstrap();
