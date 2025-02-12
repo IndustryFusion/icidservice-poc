@@ -28,7 +28,7 @@ jobs:
           export DOCKER_TAG="latest"
           NIGHTLY_DOCKER_TAG=nightly-`date -I`-`date +%s`
           docker login -u "${DOCKER_USERNAME}" -p "${DOCKER_PASSWORD}"
-          docker compose build
+          docker compose build --build-arg ENV_FILE=.env
           docker tag ${DOCKER_PREFIX}/icid-backend:${DOCKER_TAG} ${DOCKER_PREFIX}/icid-backend:${NIGHTLY_DOCKER_TAG}
           docker push ${DOCKER_PREFIX}/icid-backend:${DOCKER_TAG}
           docker push ${DOCKER_PREFIX}/icid-backend:${NIGHTLY_DOCKER_TAG}
