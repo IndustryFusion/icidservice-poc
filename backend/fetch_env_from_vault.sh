@@ -9,6 +9,9 @@ if [[ -z "$VAULT_ADDR" || -z "$VAULT_USER" || -z "$VAULT_PASS" ]]; then
   echo "Error: VAULT_ADDR, VAULT_USER, or VAULT_PASS is not set."
   exit 1
 fi
+echo "Vault ADDR: $VAULT_ADDR"
+echo "Vault User: $VAULT_USER"
+echo "Vault Pass: $VAULT_PASS"
 
 
 VAULT_TOKEN=$(curl -s --request POST \
