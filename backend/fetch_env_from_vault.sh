@@ -12,12 +12,6 @@ fi
 echo "Vault ADDR: $VAULT_ADDR"
 echo "Vault User: $VAULT_USER"
 echo "Vault Pass: $VAULT_PASS"
-
-
-VAULT_TOKEN=$(curl -s --request POST \
-  --data "{\"password\": \"$VAULT_PASS\"}" \
-  "$VAULT_ADDR/v1/auth/userpass/login/$VAULT_USER" | jq -r '.auth.client_token')
-
 echo "Vault Token: $VAULT_TOKEN"
 
 
