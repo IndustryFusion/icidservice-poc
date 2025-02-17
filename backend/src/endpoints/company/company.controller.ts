@@ -118,6 +118,11 @@ export class CompanyController {
     return this.companyService.create(data);
   }
 
+  @Get('/get-company-details-by-registration-id/:registration_code')
+  async getCompanyDetailsByRegistrationCode(@Param('registration_code') registration_code: string) {
+    return await this.companyService.getCompanyDetailsByRegistrationCode(registration_code);
+  }
+
   @Get()
   findAll() {
     return this.companyService.findAll();

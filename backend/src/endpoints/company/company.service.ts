@@ -106,6 +106,20 @@ export class CompanyService {
     }
   }
 
+  async getCompanyDetailsByRegistrationCode(registration_code: string) {
+    try {
+      return await this.companyModel.find({ registration_code });
+    } catch(err) {
+      if (err instanceof HttpException) {
+        throw err;
+      } else if(err.response) {
+        throw new HttpException(err.response.data.message, err.response.status);
+      } else {
+        throw new HttpException(err.message, HttpStatus.INTERNAL_SERVER_ERROR);
+      }
+    }
+  }
+
   findAll() {
     return `This action returns all company`;
   } 
