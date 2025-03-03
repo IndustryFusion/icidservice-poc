@@ -116,4 +116,22 @@ export class CertificateController {
       throw err;
     }
   }
+
+  @Post('verify-all-asset-certificate')
+  @ApiBody({
+    schema: {
+      type: 'array',
+      items: {
+        type: 'object',
+        example: { asset_ifric_id: 'Asset12345', certificate_data: 'base64encodedcertificatestring' }
+      },
+    }
+  })  
+  async verifyAllAssetCertificate(@Body() data: {asset_ifric_id: string, certificate_data: string}[]) {
+    try {
+      return await this.certificateService.verifyAllAssetCertificate(data);
+    } catch(err) {
+      throw err;
+    }
+  }
 }

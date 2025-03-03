@@ -64,4 +64,41 @@ export class CertificateService {
       }
     }
   }
+
+  async verifyAllAssetCertificate(data: { asset_ifric_id: string, certificate_data: string }[]) {
+    try {
+      const verfiedAssetCertificate = await Promise.all(
+        data.map(async(value) => {
+          try {
+            if(value.certificate_data) {
+              const response = await this.verifyCertificate(value.certificate_data);
+              return {
+                asset_ifric_id: value.asset_ifric_id,
+                certified: response.valid
+              }
+            } else {
+              return {
+                asset_ifric_id: value.asset_ifric_id,
+                certified: false
+              }
+            }
+          } catch(err) {
+            return {
+              asset_ifric_id: value.asset_ifric_id,
+              certified: false
+            }
+          }
+        })
+      )
+      return verfiedAssetCertificate;
+    } catch(err) {
+      if (err instanceof HttpException) {
+        throw err;
+      } else if(err.response) {
+        throw new HttpException(err.response.data.message, err.response.status);
+      } else {
+        throw new HttpException(err.message, HttpStatus.INTERNAL_SERVER_ERROR);
+      }
+    }
+  }
 }
