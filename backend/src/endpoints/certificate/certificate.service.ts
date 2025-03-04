@@ -65,32 +65,50 @@ export class CertificateService {
     }
   }
 
-  async verifyAllAssetCertificate(data: { asset_ifric_id: string, certificate_data: string }[]) {
+  async verifyAllAssetCertificate(data: { asset_ifric_id: string; certificate_data: string }[]) {
     try {
-      const verfiedAssetCertificate = await Promise.all(
-        data.map(async(value) => {
-          try {
-            if(value.certificate_data) {
-              const response = await this.verifyCertificate(value.certificate_data);
-              return {
-                asset_ifric_id: value.asset_ifric_id,
-                certified: response.valid
+      const batchSize = 100; 
+      const batchPromises = [];
+  
+      for (let i = 0; i < data.length; i += batchSize) {
+        const batch = data.slice(i, i + batchSize);
+  
+        batchPromises.push(
+          Promise.allSettled(
+            batch.map(async (value) => {
+              try {
+                if (value.certificate_data) {
+                  const formattedCertData = value.certificate_data.replace(/\\r\\n/g, '\n');
+                  const response = verifyCertificate(formattedCertData);
+                  return {
+                    asset_ifric_id: value.asset_ifric_id,
+                    certified: response.valid
+                  }
+                } else {
+                  return {
+                    asset_ifric_id: value.asset_ifric_id,
+                    certified: false
+                  }
+                }
+              } catch(err) {
+                return {
+                  asset_ifric_id: value.asset_ifric_id,
+                  certified: false
+                }
               }
-            } else {
-              return {
-                asset_ifric_id: value.asset_ifric_id,
-                certified: false
-              }
-            }
-          } catch(err) {
-            return {
-              asset_ifric_id: value.asset_ifric_id,
-              certified: false
-            }
-          }
-        })
-      )
-      return verfiedAssetCertificate;
+            })
+          )
+        );
+      }
+      
+      const batchResults = await Promise.allSettled(batchPromises);
+      
+      // Flatten the data
+      const verifiedResults = batchResults
+        .flatMap(result => result.status === "fulfilled" ? result.value : [])
+        .flatMap(inner => inner.value);
+  
+      return verifiedResults;
     } catch(err) {
       if (err instanceof HttpException) {
         throw err;
