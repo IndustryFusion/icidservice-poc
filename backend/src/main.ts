@@ -20,7 +20,6 @@ import { AppModule } from './app.module';
 import * as cors from 'cors';
 import * as cookieParser from 'cookie-parser';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import * as express from 'express';
 
 dotenv.config();
 
