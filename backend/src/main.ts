@@ -30,9 +30,6 @@ async function bootstrap() {
   // Split CORS_ORIGIN values by comma to handle multiple origins
   const allowedOrigins = process.env.CORS_ORIGIN?.split(',') || [];
 
-  app.use(express.json({ limit: '50mb' })); 
-  app.use(express.urlencoded({ limit: '50mb', extended: true }));
-
   // Using NestJS built-in CORS support with multiple origins from CORS_ORIGIN env
   app.use(cors({
     origin: allowedOrigins,
