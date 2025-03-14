@@ -50,6 +50,35 @@ export class CertificateService {
     }
   }
 
+  async generateBatchAssetCertificate(assetIds: string[], expiry: Date) {
+    try {
+      const assetCertificates = [];
+      assetIds.forEach((asset_ifric_id: string) => {
+        const { privateKey, publicKey } = generatePrivateKey();
+    
+        // Create CSR embedding UID (asset_ifric_id) and expiry
+        const csr = createCSR(privateKey, asset_ifric_id, expiry);
+        
+        // Generate client certificate using Root CA
+        const clientCert = generateClientCertificate(csr, expiry);
+        assetCertificates.push({
+          certificate_data: clientCert,
+          asset_ifric_id
+        });
+
+      })
+      return assetCertificates;
+    } catch(err) {
+      if (err instanceof HttpException) {
+        throw err;
+      } else if(err.response) {
+        throw new HttpException(err.response.data.message, err.response.status);
+      } else {
+        throw new HttpException(err.message, HttpStatus.INTERNAL_SERVER_ERROR);
+      }
+    }
+  }
+
   async verifyCertificate(certificate_data: string) {
     try {
       const formattedCertData = certificate_data.replace(/\\r\\n/g, '\n');
