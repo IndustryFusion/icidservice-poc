@@ -35,6 +35,26 @@ export class CertificateController {
     }
   }
 
+  @Post('create-batch-asset-certificate')
+  @ApiBody({
+    description: 'Create Batch Asset Certificate details',
+    required: true,
+    schema: {
+      type: 'array',
+      items: {
+        type: 'object',
+        example: { assetIds: ['A123456789'], expiry: '2025-12-31T23:59:59.999Z' }
+      }
+    },
+  })  
+  async generateBatchAssetCertificate(@Body() data: {assetIds: string[], expiry: Date}) {
+    try {
+      return await this.certificateService.generateBatchAssetCertificate(data.assetIds, new Date(data.expiry));
+    } catch(err) {
+      throw err;
+    }
+  }
+
   @Post('create-asset-certificate')
   @ApiBody({
     description: 'Create Asset Certificate details',
