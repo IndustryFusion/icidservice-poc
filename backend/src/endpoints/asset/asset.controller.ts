@@ -116,6 +116,11 @@ export class AssetController {
     return this.assetService.update(id);
   }
 
+  @Delete('bulk-delete')
+  removeAll(@Body() data: string[]) {
+    return this.assetService.removeAll(data);
+  }
+
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.assetService.remove(id);
